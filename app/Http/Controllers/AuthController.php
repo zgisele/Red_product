@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     //
-     // Inscription
+    //  Inscription
     public function register(Request $request)
     {
        $validated = $request->validate([
@@ -22,31 +22,48 @@ class AuthController extends Controller
             
         ]);
 
-        $user = User::create([
-            'name' =>$validated['name'] , 
-            'email' =>$validated['email'] ,
+        //     $user = User::create([
+        //         'name' =>$validated['name'] , 
+        //         'email' =>$validated['email'] ,
+        //         'password' => Hash::make($validated['password']),
+        //     ]);
+        //     if ($request->hasFile('image')) {
+        //      $path = $request->file('image')->store('users', 'public'); 
+        //     $validated['image'] = $path;
+        //     }
+        //     // $token = auth()->login($user);
+        //         Auth::login($user);
+        //     // return $this->respondWithToken($token);
+        //     return response()->json([
+        //         'message'=>'Utilisateur cree avec succes',
+        //         'user'=>$user,
+        //         // 'token'=> $token
+        //     ]);
+        
+        // }
+        $user = User::create ([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
+        
         if ($request->hasFile('image')) {
-         $path = $request->file('image')->store('users', 'public'); 
-        $validated['image'] = $path;
+            $path = $request->file('image')->store('users', 'public'); 
+            $user->image = $path;
+            $user->save();
         }
-        // $token = auth()->login($user);
-            Auth::login($user);
-        // return $this->respondWithToken($token);
+        
         return response()->json([
-            'message'=>'Utilisateur cree avec succes',
-            'user'=>$user,
-            // 'token'=> $token
+            'message' => 'Utilisateur créé avec succès',
+            'user'    => $user
         ]);
-       
     }
 
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = auth()->attempt($credentials)) {
+        if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -61,7 +78,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'deconnexion reussi']);
     }
 
     // Rafraîchir le token
@@ -75,7 +92,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth('api')->factory()->getTTL() * 60
         ]);
     }
 }

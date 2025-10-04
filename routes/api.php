@@ -40,6 +40,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/hotels', [HotelController::class, 'index']);
     Route::post('/hotels', [HotelController::class, 'store']);
     Route::get('/hotels/{id}', [HotelController::class, 'show']);
-    Route::put('/hotels/{id}', [HotelController::class, 'update']);
+    Route::put('/hotels/{hotel}', [HotelController::class, 'update']);
     Route::delete('/hotels/{id}', [HotelController::class, 'destroy']);
 });
