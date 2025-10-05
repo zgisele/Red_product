@@ -10,6 +10,38 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+
+        /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="Inscription d'un utilisateur",
+     *     description="Crée un nouvel utilisateur",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+    *             mediaType="multipart/form-data",
+        *             @OA\Schema(
+        *                 required={"name","email","password","password_confirmation"},
+        *                 @OA\Property(property="name", type="string", example="Alice"),
+        *                 @OA\Property(property="email", type="string", format="email", example="alice@example.com"),
+        *                 @OA\Property(property="password", type="string", format="password", example="secret123"),
+        *                 @OA\Property(property="password_confirmation", type="string", format="password", example="secret123"),
+        *                 @OA\Property(property="image", type="file", description="Image de profil")
+        *             )
+ *              )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Utilisateur créé avec succès"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation des données échouée"
+     *     )
+     * )
+     */
     //
     //  Inscription
     public function register(Request $request)
@@ -59,6 +91,32 @@ class AuthController extends Controller
         ]);
     }
 
+
+
+        /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Connexion utilisateur",
+     *     description="Authentifie l'utilisateur et retourne un token JWT",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="alice@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Connexion réussie, retourne le token"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -70,16 +128,76 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
+
+
+        /**
+     * @OA\Get(
+     *     path="/api/me",
+     *     summary="Profil utilisateur",
+     *     description="Retourne les informations de l'utilisateur connecté",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Informations de l'utilisateur"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     )
+     * )
+     */
+
     public function me()
     {
         return response()->json(auth()->user());
     }
+
+
+
+
+        /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Déconnexion utilisateur",
+     *     description="Invalidate le token JWT de l'utilisateur connecté",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Déconnexion réussie"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     )
+     * )
+     */
 
     public function logout()
     {
         auth()->logout();
         return response()->json(['message' => 'deconnexion reussi']);
     }
+
+
+        /**
+     * @OA\Post(
+     *     path="/api/refresh",
+     *     summary="Rafraîchir le token JWT",
+     *     description="Génère un nouveau token JWT pour l'utilisateur connecté",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Nouveau token généré"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     )
+     * )
+     */
 
     // Rafraîchir le token
     public function refresh()

@@ -215,6 +215,13 @@ return [
                     'in' => 'header', // The location of the API key. Valid values are "query" or "header".
                 ],
                 */
+
+            'bearerAuth' => [
+                'type' => 'apiKey',
+                'description' => 'Entrer le token JWT précédé de "Bearer "',
+                'name' => 'Authorization',
+                'in' => 'header',
+            ],
             ],
             'security' => [
                 /*
@@ -229,6 +236,7 @@ return [
 
                     'passport' => []
                     */
+                    'bearerAuth' => []
                 ],
             ],
         ],
